@@ -25,6 +25,7 @@ package jrlmwcphotos;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Set;
 
 /**
  * The entry point into the application. This will create a JSON Parser and
@@ -60,6 +61,14 @@ public class JrlmwcPhotos
         }
         
         final JsonObject jsonObject = result.toObject();
+        
+        testParser(jsonObject);
+    }   
+    
+    private static void testParser(final JsonObject jsonObject)
+    {
+        // Could call keys() and .get() on each key after converting
+        // the set into a List to get its value   
         final String status = jsonObject.get("status").toString();
         final String photosPath = jsonObject.get("photosPath").toString();
         
@@ -68,7 +77,7 @@ public class JrlmwcPhotos
         System.out.println("photosPath: " + photosPath);
         System.out.println();
         
-        JsonArray photoArray = jsonObject.get("photos").toArray();
+        final JsonArray photoArray = jsonObject.get("photos").toArray();
         
         /**
          * Example usage of iteration over JsonArray: in our case, all the
@@ -110,5 +119,5 @@ public class JrlmwcPhotos
             }
             */
         }
-    }   
+    }
 }
