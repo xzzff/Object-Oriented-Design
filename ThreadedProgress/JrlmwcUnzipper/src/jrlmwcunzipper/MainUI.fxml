@@ -1,18 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jrlmwcunzipper.MainUIScene">
    <children>
-      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+      <HBox alignment="CENTER" prefHeight="70.0" prefWidth="600.0" spacing="20.0">
          <children>
             <Button mnemonicParsing="false" onAction="#start" text="Start" />
             <Button mnemonicParsing="false" onAction="#stop" text="Stop" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" prefHeight="40.0" prefWidth="200.0" spacing="10.0">
+         <children>
+            <Label style="-fx-font-size: 20;" text="Percentage complete:" />
+            <Label fx:id="percentageCompleteLabel" style="-fx-font-size: 20;" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" prefHeight="40.0" prefWidth="200.0" spacing="10.0">
+         <children>
+            <Label style="-fx-font-size: 20;" text="Status:" />
+            <Label fx:id="statusLabel" style="-fx-font-size: 20;" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" prefHeight="40.0" prefWidth="200.0">
+         <children>
+            <ProgressBar fx:id="progressBar" prefHeight="20.0" prefWidth="384.0" progress="0.0" />
+         </children>
+      </HBox>
+      <!--Selectors for Zip File and Destination-->
+      <HBox alignment="CENTER" prefHeight="52.0" prefWidth="600.0" spacing="20.0">
+         <children>
+            <Button mnemonicParsing="false" onAction="#selectFileToUnzip" text="Select File" />
+            <Button mnemonicParsing="false" onAction="#selectDestinationDirectory" text="Select Destination" />
+         </children>
+      </HBox>
+      <!-- Display paths for the Zip File and destination. -->
+      <HBox alignment="BASELINE_LEFT" prefHeight="40.0" prefWidth="200.0" spacing="10.0">
+         <children>
+            <Label style="-fx-font-size: 20;" text="Path to Zip" />
+            <Label fx:id="zipPathLabel" style="-fx-font-size: 20;" />
+         </children>
+      </HBox>
+      <HBox alignment="BOTTOM_LEFT" prefHeight="40.0" prefWidth="200.0" spacing="10.0">
+         <children>
+            <Label alignment="BOTTOM_LEFT" style="-fx-font-size: 20;" text="Path to Destination" />
+            <Label fx:id="destinationPathLabel" style="-fx-font-size: 20;" />
          </children>
       </HBox>
    </children>
