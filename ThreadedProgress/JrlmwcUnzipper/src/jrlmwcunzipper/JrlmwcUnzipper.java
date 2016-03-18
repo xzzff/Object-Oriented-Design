@@ -30,8 +30,6 @@ public class JrlmwcUnzipper extends Application
 
     public static void main(String[] args)
     {
-        long tid = Thread.currentThread().getId();
-        System.out.println("Main UI thread ID is: " + tid);
         launch(args);
     } 
 }

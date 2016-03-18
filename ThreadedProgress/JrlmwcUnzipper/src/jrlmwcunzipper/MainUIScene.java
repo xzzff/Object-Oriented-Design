@@ -49,10 +49,13 @@ public class MainUIScene extends UIScene
         unzipper = new Unzipper();
     }
     
+    /**
+     * What happens when the window gets closed.
+     * @param we 
+     */
     @Override
     public void onClose(WindowEvent we)
     {
-        // Still some work left to do, just interrupting
         if (unzipper != null)
         {
             unzipper.interrupt();
@@ -60,16 +63,12 @@ public class MainUIScene extends UIScene
     }
     
     /**
-     * Allows the user to select the ZIP file that is to be unzipped
-     * using a File Open dialog.
-     * TODO: Maybe use different dialog box?
+     * Allows the user to select the ZIP file that is to be unzipped.
      * @param event 
      */
     @FXML
     public void selectFileToUnzip(ActionEvent event)
     {
-        System.out.println("Letting the user choose their zip file to unzip.");
-        
         FileChooser fileChooser = new FileChooser();
  
         // Set extension filter
@@ -94,14 +93,11 @@ public class MainUIScene extends UIScene
     @FXML
     public void selectDestinationDirectory(ActionEvent event)
     {
-        System.out.println("Letting the user choose their destination directory.");
-        
         DirectoryChooser directoryChooser = new DirectoryChooser();
         File dir = directoryChooser.showDialog(null);
         if (dir == null)
         {
-            System.err.println("No directory selected! "
-                + "Please select a directory before starting the unzip process.");
+            throw new NullPointerException("No directory selected!");
         }
         else
         {
@@ -118,43 +114,57 @@ public class MainUIScene extends UIScene
     @FXML
     public void start(ActionEvent event)
     {
-        System.out.println("Clicked the start button!");
+        restartIfNecessary();
+       
         progressBar.setProgress(0);
         
         unzipper.setOnNotification((double percentComplete, Status status) ->
-        {
-            System.out.println("Percent complete in handle is: " +
-                percentComplete);
-            
-            int prettyPercent = (int) Math.floor(percentComplete * 100);
+        {   
+            final int prettyPercent = (int) Math.floor(percentComplete * 100);
             percentageCompleteLabel.setText(Integer.toString(prettyPercent));
             
             statusLabel.setText(status.toString());
             
             // This needs to be in the range of (0.0, 1.0).
             progressBar.setProgress(percentComplete);
-            
-            if (status == Status.FINISHED || status == Status.INTERRUPTED)
-            {
-                unzipper = null;
-            }
         });    
         // Do work in another thread
         unzipper.start(); // implicitly calls unzipper.run()
     }
     
     /**
+     * This is a bit of a hacky way to get around making it easy to resume
+     * after interrupting the thread/stopping. We just create a new Unzipper,
+     * i.e. a new thread. There are certainly fancier ways to implement this
+     * "restart" feature.
+     */
+    private void restartIfNecessary()
+    {       
+        // Our thread got interrupted. We need to resume swiftfully.
+        if (unzipper.getStatus() == Status.INTERRUPTED)
+        {
+            // Interrupted previously, starting over now
+            unzipper = new Unzipper(
+                unzipper.getSource(), unzipper.getDestinationPath());
+        }
+        // Finished already, but we want to unzip some more!
+        if (unzipper.getStatus() == Status.FINISHED)
+        {
+            unzipper = new Unzipper(
+                unzipper.getSource(), unzipper.getDestinationPath());
+        }
+    }
+    
+    /**
      * What happens when the stop button is pressed, i.e. when the user
      * wants to interrupt/stop the file extraction.
-     * TODO: support resuming easily with start
      * @param event
      */
     @FXML
     public void stop(ActionEvent event)
     {
-        System.out.println("Clicked the stop button!");
         if (unzipper == null) return;
-        unzipper.setStatus(Status.INTERRUPTED);
+        unzipper.setStatus(Status.INTERRUPTED); // part of the glorious hack
         statusLabel.setText(Status.INTERRUPTED.toString());
         unzipper.interrupt();
     } 
