@@ -156,6 +156,10 @@ public class MainUIScene extends UIScene
         // Our thread got interrupted. We need to resume swiftfully.
         if (unzipper.getStatus() == Status.INTERRUPTED)
         {
+            if (!isTextAreaEmpty())
+            { 
+                extractPaths.setText("");
+            }
             // Interrupted previously, starting over now
             unzipper = new Unzipper(
                 unzipper.getSource(), unzipper.getDestinationPath());
@@ -163,9 +167,18 @@ public class MainUIScene extends UIScene
         // Finished already, but we want to unzip some more!
         if (unzipper.getStatus() == Status.FINISHED)
         {
+            if (!isTextAreaEmpty())
+            {
+                extractPaths.setText("");
+            }
             unzipper = new Unzipper(
                 unzipper.getSource(), unzipper.getDestinationPath());
         }
+    }
+    
+    private boolean isTextAreaEmpty()
+    {
+        return extractPaths.getText().trim().isEmpty();
     }
     
     /**
@@ -178,6 +191,7 @@ public class MainUIScene extends UIScene
     {
         unzipper.setStatus(Status.INTERRUPTED); // part of the glorious hack
         statusLabel.setText(Status.INTERRUPTED.toString());
+        extractPaths.setText("");
         unzipper.interrupt();
     } 
 }
