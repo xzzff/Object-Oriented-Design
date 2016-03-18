@@ -7,13 +7,10 @@ package jrlmwcunzipper;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.FileHeader;
-import net.lingala.zip4j.progress.ProgressMonitor;
 
 /**
  * 
@@ -39,6 +36,8 @@ public class Unzipper extends Thread
     */
    private long filesExtracted;
    private long filesTotal;
+   
+   private String currentProcessingFile;
     
    public Unzipper()
    {
@@ -90,7 +89,6 @@ public class Unzipper extends Thread
         {
             List fileHeaderList = zipFile.getFileHeaders();
             this.filesTotal = fileHeaderList.size();
-            // TODO: Ugly to not be able to use foreach loop
             for (int i = 0; i < filesTotal; ++i)
             {
                 if (Thread.interrupted())
@@ -100,16 +98,14 @@ public class Unzipper extends Thread
                 }
                 final FileHeader fh = (FileHeader) fileHeaderList.get(i);
                 zipFile.extractFile(fh, destinationPath.toString());
-                final String currentProcessedFile = fh.getFileName();
-                System.out.println("Currently processing: " + 
-                    currentProcessedFile);
+                this.currentProcessingFile = fh.getFileName();
                 this.filesExtracted++;
                 updateProgress();
-//                Thread.sleep(1500);
             }
         }
-        catch(ZipException e)//| InterruptedException e)
+        catch(ZipException e)
         {
+            throw e;
         }
    }
    
@@ -121,8 +117,8 @@ public class Unzipper extends Thread
        }
        if (destinationPath == null)
        {
-           throw new NullPointerException("Destination extraction path"
-                   + " is null.");
+           throw new NullPointerException
+                ("Destination extraction path is null.");
        }
    }
    
@@ -150,7 +146,7 @@ public class Unzipper extends Thread
            double percentageDone = (double) filesExtracted / filesTotal;
            Platform.runLater(() ->
            {
-              notification.handle(percentageDone, status);
+               notification.handle(percentageDone, currentProcessingFile, status);
            });
         }
    }

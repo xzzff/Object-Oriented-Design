@@ -12,5 +12,5 @@ package jrlmwcunzipper;
 @FunctionalInterface
 public interface Notification
 {
-    public void handle(double percentComplete, Status status);
+    public void handle(double percentComplete, String extractPath, Status status);
 }

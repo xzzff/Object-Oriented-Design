@@ -14,6 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TextArea;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.WindowEvent;
@@ -41,8 +42,19 @@ public class MainUIScene extends UIScene
     @FXML
     private Label destinationPathLabel;
     
+    @FXML
+    private TextArea extractPaths;
+    
     private Unzipper unzipper;
 
+    /**
+     * Instead of having to deal with managing lifetime and scope of the Unzipper
+     * object before start button is pressed, and whether user selects the
+     * zip file or directory first, we just start off our scene with a fresh
+     * Unzipper. Life is good.
+     * @param url
+     * @param rb 
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb)
     {
@@ -78,7 +90,6 @@ public class MainUIScene extends UIScene
 
         // Show open file dialog
         File file = fileChooser.showOpenDialog(null);
-        System.out.println("The zip path is: " + file.getPath());
         zipPathLabel.setText(file.getPath());
         
         final Path path = Paths.get(file.getPath());
@@ -118,12 +129,14 @@ public class MainUIScene extends UIScene
        
         progressBar.setProgress(0);
         
-        unzipper.setOnNotification((double percentComplete, Status status) ->
+        unzipper.setOnNotification(
+            (double percentComplete, String extractPath, Status status) ->
         {   
             final int prettyPercent = (int) Math.floor(percentComplete * 100);
             percentageCompleteLabel.setText(Integer.toString(prettyPercent));
             
             statusLabel.setText(status.toString());
+            extractPaths.appendText(extractPath + "\n");
             
             // This needs to be in the range of (0.0, 1.0).
             progressBar.setProgress(percentComplete);
@@ -163,7 +176,6 @@ public class MainUIScene extends UIScene
     @FXML
     public void stop(ActionEvent event)
     {
-        if (unzipper == null) return;
         unzipper.setStatus(Status.INTERRUPTED); // part of the glorious hack
         statusLabel.setText(Status.INTERRUPTED.toString());
         unzipper.interrupt();

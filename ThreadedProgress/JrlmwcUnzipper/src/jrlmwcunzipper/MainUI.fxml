@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
@@ -7,23 +8,35 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jrlmwcunzipper.MainUIScene">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="jrlmwcunzipper.MainUIScene">
    <children>
-      <HBox alignment="CENTER" prefHeight="70.0" prefWidth="600.0" spacing="20.0">
+      <HBox alignment="CENTER" prefHeight="51.0" prefWidth="600.0" spacing="20.0">
          <children>
-            <Button mnemonicParsing="false" onAction="#start" text="Start" />
-            <Button mnemonicParsing="false" onAction="#stop" text="Stop" />
+            <Button mnemonicParsing="false" onAction="#start" text="Start">
+               <font>
+                  <Font size="12.0" />
+               </font></Button>
+            <Button mnemonicParsing="false" onAction="#stop" text="Stop">
+               <font>
+                  <Font size="12.0" />
+               </font></Button>
          </children>
       </HBox>
       <HBox alignment="CENTER" prefHeight="40.0" prefWidth="200.0" spacing="10.0">
          <children>
-            <Label style="-fx-font-size: 20;" text="Percentage complete:" />
+            <Label prefHeight="1.0" prefWidth="208.0" style="-fx-font-size: 20;" text="Percentage complete:">
+               <font>
+                  <Font size="12.0" />
+               </font></Label>
             <Label fx:id="percentageCompleteLabel" style="-fx-font-size: 20;" />
          </children>
       </HBox>
       <HBox alignment="CENTER" prefHeight="40.0" prefWidth="200.0" spacing="10.0">
          <children>
-            <Label style="-fx-font-size: 20;" text="Status:" />
+            <Label style="-fx-font-size: 20;" text="Status:">
+               <font>
+                  <Font size="12.0" />
+               </font></Label>
             <Label fx:id="statusLabel" style="-fx-font-size: 20;" />
          </children>
       </HBox>
@@ -35,21 +48,32 @@
       <!--Selectors for Zip File and Destination-->
       <HBox alignment="CENTER" prefHeight="52.0" prefWidth="600.0" spacing="20.0">
          <children>
-            <Button mnemonicParsing="false" onAction="#selectFileToUnzip" text="Select File" />
-            <Button mnemonicParsing="false" onAction="#selectDestinationDirectory" text="Select Destination" />
+            <Button mnemonicParsing="false" onAction="#selectFileToUnzip" text="Select File">
+               <font>
+                  <Font size="12.0" />
+               </font></Button>
+            <Button mnemonicParsing="false" onAction="#selectDestinationDirectory" text="Select Destination">
+               <font>
+                  <Font size="12.0" />
+               </font></Button>
          </children>
       </HBox>
       <!-- Display paths for the Zip File and destination. -->
       <HBox alignment="BASELINE_LEFT" prefHeight="40.0" prefWidth="200.0" spacing="10.0">
          <children>
-            <Label style="-fx-font-size: 20;" text="Path to Zip" />
+            <Label prefHeight="15.0" prefWidth="104.0" style="-fx-font-size: 20;" text="Path to Zip" />
             <Label fx:id="zipPathLabel" style="-fx-font-size: 20;" />
          </children>
       </HBox>
       <HBox alignment="BOTTOM_LEFT" prefHeight="40.0" prefWidth="200.0" spacing="10.0">
          <children>
-            <Label alignment="BOTTOM_LEFT" style="-fx-font-size: 20;" text="Path to Destination" />
+            <Label alignment="BOTTOM_LEFT" prefHeight="18.0" prefWidth="181.0" style="-fx-font-size: 20;" text="Path to Destination" />
             <Label fx:id="destinationPathLabel" style="-fx-font-size: 20;" />
+         </children>
+      </HBox>
+      <HBox alignment="BOTTOM_CENTER" prefHeight="250.0" prefWidth="250.0" spacing="10.0">
+         <children>
+            <TextArea fx:id="extractPaths" prefHeight="190.0" prefWidth="954.0" />
          </children>
       </HBox>
    </children>
