@@ -16,7 +16,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import ui.UIScene;
 
@@ -74,9 +73,9 @@ public class MainUIScene extends UIScene
         FileChooser fileChooser = new FileChooser();
  
         // Set extension filter
-        FileChooser.ExtensionFilter extFilter = 
+        final FileChooser.ExtensionFilter extensionFilter = 
             new FileChooser.ExtensionFilter("Zip files (*.zip)", "*.zip");
-        fileChooser.getExtensionFilters().add(extFilter);
+        fileChooser.getExtensionFilters().add(extensionFilter);
 
         // Show open file dialog
         File file = fileChooser.showOpenDialog(null);
@@ -101,7 +100,8 @@ public class MainUIScene extends UIScene
         File dir = directoryChooser.showDialog(null);
         if (dir == null)
         {
-            System.err.println("No directory selected!");
+            System.err.println("No directory selected! "
+                + "Please select a directory before starting the unzip process.");
         }
         else
         {
@@ -121,19 +121,24 @@ public class MainUIScene extends UIScene
         System.out.println("Clicked the start button!");
         progressBar.setProgress(0);
         
-        unzipper.setOnNotification((percentComplete, status) -> {
-            // Set text on label
-            percentageCompleteLabel.setText(Double.toString(percentComplete));
-            statusLabel.setText(status.toString());
-            progressBar.setProgress(percentComplete);
-            
-            // Done?
-            if (status == Status.FINISHED || status == Status.INTERRUPTED)
+        unzipper.setOnNotification(new Notification()
+        {
+            @Override
+            public void handle(int percentComplete, Status status)
             {
-                unzipper = null;
+                // Set text on label
+                percentageCompleteLabel.setText(Integer.toString(percentComplete));
+                statusLabel.setText(status.toString());
+                progressBar.setProgress(percentComplete);
+                
+                // Done?
+                if (status == Status.FINISHED || status == Status.INTERRUPTED)
+                {
+                    unzipper = null;
+                }
             }
         });    
-        // Do work
+        // Do work in another thread
         unzipper.start(); // implicitly calls unzipper.run()
     }
     

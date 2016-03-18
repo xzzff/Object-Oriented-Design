@@ -12,6 +12,5 @@ package jrlmwcunzipper;
 @FunctionalInterface
 public interface Notification
 {
-    // TODO: Change this up a bit
-    public void handle(double percentComplete, Status status);
+    public void handle(int percentComplete, Status status);
 }

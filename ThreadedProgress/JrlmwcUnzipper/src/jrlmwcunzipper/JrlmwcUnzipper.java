@@ -22,7 +22,6 @@ public class JrlmwcUnzipper extends Application
     public void start(Stage stage) throws Exception
     {
         Parent root = FXMLLoader.load(getClass().getResource("MainUI.fxml"));
-        
         Scene scene = new Scene(root);
         
         stage.setScene(scene);
@@ -31,6 +30,8 @@ public class JrlmwcUnzipper extends Application
 
     public static void main(String[] args)
     {
+        long tid = Thread.currentThread().getId();
+        System.out.println("Main UI thread ID is: " + tid);
         launch(args);
     } 
 }

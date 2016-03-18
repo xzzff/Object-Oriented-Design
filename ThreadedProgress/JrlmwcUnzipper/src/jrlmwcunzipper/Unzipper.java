@@ -6,9 +6,13 @@
 package jrlmwcunzipper;
 
 import java.nio.file.Path;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.progress.ProgressMonitor;
 
 /**
@@ -19,7 +23,7 @@ public class Unzipper extends Thread
 {
    private Status status;
    private Notification notification;
-   private final ProgressMonitor progressMonitor;
+   private ZipFile zipFile;
    
    /* 
     * These get set by the MainUIScene as they must be set before trying
@@ -27,53 +31,88 @@ public class Unzipper extends Thread
     */
    private Path sourceZipPath;
    private Path destinationPath;
+   
+   // Used for keeping track of state of percentage done since
+   // was having issues with ProgressMonitor
+   private long filesExtracted;
+   private long filesTotal;
     
    public Unzipper()
    {
        status = Status.NOT_STARTED;
-       this.progressMonitor = new ProgressMonitor();
+       filesExtracted = filesTotal = 0;
    }
    
    @Override
    public void run()
    {
-       status = Status.EXTRACTING;
+       long tid = Thread.currentThread().getId();
+       System.out.println("Extracter thread ID is: " + tid);    
        try
        {
-           unzipFiles(sourceZipPath, destinationPath);
+           validatePaths();
+           this.zipFile = new ZipFile(sourceZipPath.toString());
+           if(zipFile.isEncrypted())
+           {
+               // TODO: Could ask user for password and use it to decrypt.
+               throw new ZipException("Do not support encrypted Zip Files.");
+           }
+           unzipFiles();
        }
        catch (ZipException e)
        {
-           System.err.println("Caught the Zip Exception. Uh oh.");
-           System.exit(0);
+           System.err.println("Something went wrong during the extraction.");
+           System.err.println(e.getMessage());
        }
-       
-       System.out.println("Should be unzipping files right now which could"
-           + "take a long time.");
            
        onFinish();
    }
    
-   public void unzipFiles(Path source, Path destination) throws ZipException
+   public void unzipFiles() throws ZipException
    {
-       if (source == null)
+        System.out.println("About to unzip files.");
+        status = Status.EXTRACTING;
+        zipFile.setRunInThread(false);
+        try
+        {
+            List fileHeaderList = zipFile.getFileHeaders();
+            System.out.println("There are " + fileHeaderList.size() + " files to"
+                + " be extracted.");
+            this.filesTotal = fileHeaderList.size();
+            for (int i = 0; i < filesTotal; ++i)
+            {
+                if (Thread.interrupted())
+                {
+                    onInterrupt();
+                    return;
+                }
+                final FileHeader fh = (FileHeader) fileHeaderList.get(i);
+                zipFile.extractFile(fh, destinationPath.toString());
+                final String currentProcessedFile = fh.getFileName();
+                System.out.println("Currently processing: " + 
+                    currentProcessedFile);
+                Thread.sleep(250);
+                this.filesExtracted++;
+                updatePercentageDone();
+            }
+        }
+        catch(ZipException | InterruptedException e)
+        {
+            
+        }
+        
+   }
+   
+   public void validatePaths()
+   {
+       if (sourceZipPath == null)
        {
-           System.err.println("Invalid zip file or no zip file selected.");
+           throw new NullPointerException("Source zip path is null.");
        }
-       if (destination == null)
+       if (destinationPath == null)
        {
-           System.err.println("Invalid destination directory. Please try again.");
-       }
-       
-       try
-       {
-           ZipFile zipFile = new ZipFile(source.toString());
-           zipFile.extractAll(destination.toString());
-       }
-       catch(ZipException e)
-       {
-           System.err.println("Error in unzipped the files.");
-           throw e;
+           throw new NullPointerException("Destination extraction path"
+                   + " is null.");
        }
    }
    
@@ -81,33 +120,37 @@ public class Unzipper extends Thread
    {
        System.out.println("In onInterrupt() method.");
        status = Status.INTERRUPTED;
-       notifyPercentageDone();
+       updatePercentageDone();
    }
    
    public void onFinish()
    {
        System.out.println("In onFinish() method.");
        status = Status.FINISHED;
-       notifyPercentageDone();
+       updatePercentageDone();
    }
    
    /**
-    * Notifies the UI thread about the progression, i.e.
-    * percentage complete.
+    * Notifies the UI thread about the progression, i.e. percentage complete.
     */
-   private void notifyPercentageDone()
+   private void updatePercentageDone()
    {
        if (notification != null)
        {
-           Platform.runLater(() -> {
-              notification.handle(progressMonitor.getPercentDone(), status);
-           });
+//           int percentComplete = progressMonitor.getPercentDone();
+           int percentageDone = (int) ((filesExtracted * 100f) / filesTotal);
+           System.out.println("Percent complete is: " + percentageDone);
+//           System.out.println("Current status is: " + status);
+            // TODO: Fix this null problem
+//           Platform.runLater(() -> {
+//              notification.handle(percentComplete, status);
+//           });
         }
    }
    
-   public void setOnNotification(Notification n)
+   public void setOnNotification(Notification notification)
    {
-       this.notification = n;
+       this.notification = notification;
    }
    
    public void setSourceZipPath(Path path)
