@@ -68,7 +68,7 @@ public class MainUIScene extends UIScene
     @Override
     public void onClose(WindowEvent we)
     {
-        if (unzipper != null)
+        if (!unzipper.isInterrupted())
         {
             unzipper.interrupt();
         }
@@ -90,6 +90,10 @@ public class MainUIScene extends UIScene
 
         // Show open file dialog
         File file = fileChooser.showOpenDialog(null);
+        if (file == null)
+        {
+            throw new NullPointerException("Must select a file in the File Dialog.");
+        }
         zipPathLabel.setText(file.getPath());
         
         final Path path = Paths.get(file.getPath());
@@ -146,39 +150,41 @@ public class MainUIScene extends UIScene
     }
     
     /**
-     * This is a bit of a hacky way to get around making it easy to resume
-     * after interrupting the thread/stopping. We just create a new Unzipper,
-     * i.e. a new thread. There are certainly fancier ways to implement this
-     * "restart" feature.
+     * If the current thread was interrupted (stopped) or it finished and we
+     * want to keep unzipping files, we need to start a new thread to do so.
      */
     private void restartIfNecessary()
-    {       
-        // Our thread got interrupted. We need to resume swiftfully.
-        if (unzipper.getStatus() == Status.INTERRUPTED)
+    {
+        /**
+         * Currently there are two scenarios:
+         * 1) Our original thread got interrupted/stopped. We want to just
+         *    start over -- note we will not try to resume from where we left
+         *    off in the new execution.
+         * 2) Our original thread finished its execution just fine (i.e. finished
+         *    extracting all of the files), but now we want to unzip more things.
+         */
+        final Status currentStatus = unzipper.getStatus();
+        if (currentStatus == Status.INTERRUPTED || 
+            currentStatus == Status.FINISHED)
         {
-            if (!isTextAreaEmpty())
-            { 
-                extractPaths.setText("");
-            }
-            // Interrupted previously, starting over now
-            unzipper = new Unzipper(
-                unzipper.getSource(), unzipper.getDestinationPath());
-        }
-        // Finished already, but we want to unzip some more!
-        if (unzipper.getStatus() == Status.FINISHED)
-        {
-            if (!isTextAreaEmpty())
+            // Since we're starting a new execution, we should tidy up.
+            if (isTextAreaEmpty())
             {
-                extractPaths.setText("");
+                clearTextArea();
             }
-            unzipper = new Unzipper(
-                unzipper.getSource(), unzipper.getDestinationPath());
+            unzipper = new Unzipper(unzipper.getSource(), 
+                                    unzipper.getDestinationPath());
         }
     }
     
     private boolean isTextAreaEmpty()
     {
         return extractPaths.getText().trim().isEmpty();
+    }
+    
+    private void clearTextArea()
+    {
+        extractPaths.setText("");
     }
     
     /**
@@ -189,9 +195,9 @@ public class MainUIScene extends UIScene
     @FXML
     public void stop(ActionEvent event)
     {
-        unzipper.setStatus(Status.INTERRUPTED); // part of the glorious hack
+        unzipper.setStatus(Status.INTERRUPTED);
         statusLabel.setText(Status.INTERRUPTED.toString());
-        extractPaths.setText("");
+        clearTextArea();
         unzipper.interrupt();
     } 
 }
