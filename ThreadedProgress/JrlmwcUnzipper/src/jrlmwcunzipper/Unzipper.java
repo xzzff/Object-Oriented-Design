@@ -94,6 +94,7 @@ public class Unzipper extends Thread
                 Thread.sleep(250);
                 this.filesExtracted++;
                 updatePercentageDone();
+                Thread.sleep(4 * 1000);
             }
         }
         catch(ZipException | InterruptedException e)
@@ -137,14 +138,12 @@ public class Unzipper extends Thread
    {
        if (notification != null)
        {
-//           int percentComplete = progressMonitor.getPercentDone();
-           int percentageDone = (int) ((filesExtracted * 100f) / filesTotal);
-           System.out.println("Percent complete is: " + percentageDone);
-//           System.out.println("Current status is: " + status);
-            // TODO: Fix this null problem
-//           Platform.runLater(() -> {
-//              notification.handle(percentComplete, status);
-//           });
+           // This will be a number between 0.0 and 1.0
+           double percentageDone = (double) filesExtracted / filesTotal;
+           Platform.runLater(() ->
+           {
+              notification.handle(percentageDone, status);
+           });
         }
    }
    
@@ -161,5 +160,15 @@ public class Unzipper extends Thread
    public void setDestinationPath(Path path)
    {
        this.destinationPath = path;
+   }
+   
+   public void setStatus(Status newStatus)
+   {
+       this.status = newStatus;
+   }
+   
+   public Status getStatus()
+   {
+       return status;
    }
 }

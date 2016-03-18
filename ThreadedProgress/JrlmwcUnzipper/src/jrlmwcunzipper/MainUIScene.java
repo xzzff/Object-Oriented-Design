@@ -121,21 +121,22 @@ public class MainUIScene extends UIScene
         System.out.println("Clicked the start button!");
         progressBar.setProgress(0);
         
-        unzipper.setOnNotification(new Notification()
+        unzipper.setOnNotification((double percentComplete, Status status) ->
         {
-            @Override
-            public void handle(int percentComplete, Status status)
+            System.out.println("Percent complete in handle is: " +
+                percentComplete);
+            
+            int prettyPercent = (int) Math.floor(percentComplete * 100);
+            percentageCompleteLabel.setText(Integer.toString(prettyPercent));
+            
+            statusLabel.setText(status.toString());
+            
+            // This needs to be in the range of (0.0, 1.0).
+            progressBar.setProgress(percentComplete);
+            
+            if (status == Status.FINISHED || status == Status.INTERRUPTED)
             {
-                // Set text on label
-                percentageCompleteLabel.setText(Integer.toString(percentComplete));
-                statusLabel.setText(status.toString());
-                progressBar.setProgress(percentComplete);
-                
-                // Done?
-                if (status == Status.FINISHED || status == Status.INTERRUPTED)
-                {
-                    unzipper = null;
-                }
+                unzipper = null;
             }
         });    
         // Do work in another thread
@@ -153,6 +154,8 @@ public class MainUIScene extends UIScene
     {
         System.out.println("Clicked the stop button!");
         if (unzipper == null) return;
+        unzipper.setStatus(Status.INTERRUPTED);
+        statusLabel.setText(Status.INTERRUPTED.toString());
         unzipper.interrupt();
     } 
 }
