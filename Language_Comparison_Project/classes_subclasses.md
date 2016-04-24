@@ -188,4 +188,60 @@ public class Foo
 ```
 
 # Static 
-TODO - Discuss static member variable usage
+With Cpp, the keyword `static` declares members that are not bound to a particular class instance. Outside of a class definition, it has a different meaning known as static storage duration. This has more to do with internal linkage for LTO purposes of a compiler and determining what is valid when compiling multiple translation units. That is beyond the scope of this language comparison project, so we omit the details.
+
+The syntax and examples are shown below. They are taken from [CppReference](http://en.cppreference.com/w/cpp/language/static).
+
+1. `static` *data_member*
+2. `static` *member_funtion*
+
+```cpp
+class X
+{
+  static int n;
+};
+```
+
+In particular, the declaration inside a class body is not a definition and can even declare members to be of incomplete type. For example:
+
+```cpp
+struct Foo; // forward declare
+struct X
+{
+  static int a[]; // declaration and incomplete type
+  static Foo x; // declaration and incomplete type
+  static S s; // declaration and incomplete type (despite being inside own definition)
+};
+
+int S::a[10]; // definiton and complete type now that we specified the compile-time size of the array
+struct Foo {};
+Foo S::x; // definition and complete type
+S S::s; //definition and complete type
+```
+
+Recall that in inheritance with Cpp, static members of a base class are also static members of any derived class. They will each share the same instance of that static variable, rather than having their own copy. For example, with the example program below, the value of the `total` variable would be 4 since the construction of the `Derived` class would cause the `total` to be incremented twice. This is due to the Derived class constructor calling the Base class constructor.
+
+```cpp
+class Base
+{
+  public:
+    Base() { total++; }
+    static int total;
+};
+int Base::total = 0;
+
+class Derived : public Base
+{
+  public:
+    Derived() { total++; }
+};
+
+int main(int argc, char** argv)
+{
+  Base a;
+  Base b;
+  Derived c;
+  // Here, the value of total would be 4
+  return 0;
+}
+```
