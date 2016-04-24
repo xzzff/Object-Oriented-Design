@@ -1,5 +1,11 @@
 # Overview
-TODO
+Here we discuss how Cpp and Java compare with regards to classes, subclasses, and how each manages constructor delegating/chaining, destructors, and static variable.
+
+In terms of class definitions and to refer to an instance of an object of a class (using `this`), both languages are very similar. With Cpp, one has much more explicit control over destructors and managing the scope and lifetime of objects. 
+
+We do not discuss this explicitly later on, but Cpp allows you to have default parameter values in methods (including constructors), whereas Java does not. Java accomplishes this purely via method overloading. 
+
+Static works a bit differently between the two languages. Notably, Java does not support static local variables and Cpp gives you a bit more flexibility with declarations of static variable with incomplete type within a class definition to be filled later on. There is also more control over resolution in internal vs external linkage with the `static` keyword in Cpp.
 
 # Classes
 
@@ -245,3 +251,5 @@ int main(int argc, char** argv)
   return 0;
 }
 ```
+
+In Java, static variables in Java are not inherited. They exist only in the class which declares them. Note that public or protected member variables (static or not) are visible in all subclasses of the Base class. Unlike Cpp, Java does not support static local variables. However, unlike Cpp, Java does support static blocks which are useful for static initialization of a class.
