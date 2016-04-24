@@ -13,21 +13,31 @@ class Person
     Person(std::string n) : name(n)
     {
     }
-    /* Alternate constructor
-    Person(std::string n)
-    {
-      this->name = n;
-    }
-    */
     
     // Destructor
     ~Person()
      {
        // Destruct dynamic memory here and do clean-up if need be.
      }
-  std::string name;
+  private:
+    std::string name;
 };
 ```
+Note that we could have written the constructor more like a Java-style like this:
+```cpp
+class Person
+{
+  public:
+    Person(std::string n)
+    {
+      this->name = n;
+    }
+
+  private:
+    std::string name;
+};
+```
+
 In Java, the same example is below.
 
 ```java
@@ -35,9 +45,9 @@ In Java, the same example is below.
   {
     private String name;
 
-    public Person(String name)
+    public Person(String n)
     {
-      this->name = name;
+      this->name = n;
     }
   }
 ```
@@ -78,8 +88,104 @@ Note in particular that we have explicit control over destructors and memory man
 Both languages use the `this` keyword to accomplish this. This is seen in the first Cpp example under the Classes section for the constructor. However, in the general concensus in the Cpp communitity it to note use `this->`.
 
 # Subclasses
+Subclasses come up very often by nature and are represented by inheritance. Since we have discussed this in detail in a previous post with access control, we leave it at that. Instead, we discuss constructors, constructor chaining, and destructors when it comes to subclasses.
 
 ### Constructors
-TODO: How constructors can utilize other constructors
+The notion of constructor chaining occurs most notably during inheritance. A subclass constructor's first job is to call its superclass' constructor. This forces the creation of the subclass object to start with the initialization of classes above it in the inheritance chain. Some examples with subclasses and constructor chaining are given below.
+
+```cpp
+class Base
+{
+  public:
+    Base(int x)
+    {
+      // Do something with x here
+    }
+};
+
+class Derived : public Base
+{
+  public:
+    Derived(int x, int y) 
+      : Base(x), // Call base constructor in the derived class constructor
+      foo(y)     // Set member variable foo in Derived class with value of y
+    {
+    }
+  private:
+    int foo;
+};
+```
+
+In Java, one can use the 'this' keyword to call a constructor *within the same class* and the `super` keyword to call the constructor *of the Parent class*. Note that `super` needs to be the first line in the body of a constructor method.
+
+```java
+class Parent
+{
+  private String name;
+
+  public Parent()
+  {
+  }
+
+  public Parent(String n)
+  {
+    this.name = n;
+  }
+}
+
+public class Child extends Parent
+{
+  public Child(String name)
+  {
+    super(name);
+    // Do more stuff in child constructor after calling parent
+  }
+}
+```
+
+To utilize other constructors within the same class, a few examples can be found below.
+
+This is known as Delegating Constructors which is similar to the  notion of calling constructors from other constructors in Java. It is actually a recent  Cpp-11 addition. Previously, in Cpp-03, people would mimic similar behavior to call constructors by making the method that delegates a non-constructor. For example, if you look at older APIs, that is why you see things like `init()`, `cleanup()`, etc. This is similar behavior as in C APIs as well.
+
+```cpp
+class Foo
+{
+  public:
+    Foo(char x, int y)
+    {
+    }
+    Foo(int y) : Foo('a', y) // Calls other constructor above with two args.
+    {
+    }
+}
+```
+
+In Java, this is accomplished via overriding since you can have multiple constructors as long as the parameter list of types is different. Note that the `super` keyword still must be the first statement in your constructor body if you are using it to invoke another constructor.
+
+```java
+public class Foo
+{
+  private double width;
+  private double height;
+
+  Foo(double x)
+  {
+    // Calls two-arg constructor after invoking calculateHeight method
+    this(width, calculateHeight(width));
+  }
+  Foo(double x, double y)
+  {
+    this.width = x;
+    this.height = y;
+  }
+
+  private static double calculateHeight(final double width)
+  {
+    return 2*width;
+    // Could have more complex logic most certainly
+  }
+}
+```
 
 # Static 
+TODO - Discuss static member variable usage
