@@ -10,8 +10,8 @@ When using `operator==` for `std::basic_string` it is implemented by just checki
 
 An example:
 ```cpp
-    auto s = s"hello";
-    auto t = s"HELLO";
+    auto s = "hello"s;
+    auto t = "HELLO"s;
     if (std::to_lower(t) == s)
     {
         // Strings s and t matched
