@@ -1,6 +1,46 @@
-# Overview
-
 # Cpp
+### Lambda Expressions
+Using lambdas allows you to define functions locally at the place of the call. They have the form
+``` cpp
+    [capture](params) -> return-type {body}
+```
+An example for adding two numbers inline:
+```cpp
+    auto sum = [](int64_t x, int64_t y) { return x + y; };
+    // Example invocation
+    std::cout << sum(5, 10); // prints 15
+```
+Now with support for auto `decltype` we could even do auto parameters in our capture list for the lambda.
+```cpp
+    auto genericLambda = [](auto a, auto&& b) { return a < b; };
+    // Example invocation
+    bool b = genericLambda(3, 3.14); // Different types, no problem
+```
+
+Overall, the notion of anonymous functions and their usages are similar in both languages. However, Cpp's capture-list semantics and power is much stronger than Java. Since it is quite complicated with parameter pack capturing (by-copy, by-ref, pack expansions, initializers, etc), we omit the details. See [here] (http://en.cppreference.com/w/cpp/language/lambda) for more information.
+
+### Functions as First Class Objects
+To declare functions as first class objects, we can use `std::function<>`. It is a general purpose polymorphic function wrapper. Instances of `std::function` can store, copy, and invoke any `Callable` -- functions, lambdas, bind expressions, other function objects, pointers to member functions, and pointers to data members for example. 
+
+An example storing a free function:
+```cpp
+    void print_num(int64_t x)
+    {
+        std::cout << x << '\n';
+    }
+
+    // Example invocation
+    int main()
+    {
+        std::function<void>(int64_t) f = print_num;
+        f(5); // Calls print_num(5)
+    }
+```
+
+### Remarks
+Some notable lacking functional features include:
+* Lazy evaluation
+* Software transactional memory
 
 # Java
 Just recently in Java 8 did we see somre more functional features. We talk about them in more detail and give examples below.
