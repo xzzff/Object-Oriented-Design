@@ -1,10 +1,12 @@
 # Cpp
 In Cpp, memory management *can* be done completely by the programmer by using the `new` and `delete` keywords to request and delete memory for objects, respectively. Since those are very similar to `malloc` and `free` in many ways, we do not discuss them as many readers are familiar with the details.
 
+Overall, memory management in Cpp is done through constructors, destructors, and smart pointers.
+
 Instead, we just focus on how memory management is easier in modern cpp thanks to things like `std::unique_ptr` and `std::shared_ptr`. These constructs known as "smart pointers" make managing dynamically created objects very simply with easy ownership semantics.
 
 ### RAII
-RAII, or *Resource Acquistion Is Initialization* is a technique which binds the life cycle of a resource to the lifetime of an object. It can be summarized as follows as stated here at [CppReference](http://en.cppreference.com/w/cpp/language/raii).
+Cpp relies heavily on RAII, also known as *Resource Acquistion Is Initialization*. RAII is a technique which binds the life cycle of a resource to the lifetime of an object. It can be summarized as follows as stated here at [CppReference](http://en.cppreference.com/w/cpp/language/raii).
 * Encapsulate each resource into a class where
   * Constructor acquired resources, establishes class invariants, or throws an exception if such things cannot be done.
   * Destructor releases the resource and never throws exceptions
@@ -34,5 +36,12 @@ There is not much to say about garbage collection as it is apparent and straight
 * All references to said object are set to null.
 * The object is created inside a block scope and the reference goes out of scope once the control flow exists that block.
 * If an object has only weak references. For example, see WeakHashMap. The discussion between WeakReferences, SoftReferences, PhantomReferences, and StrongReferences is a bit more involved and out of the scope for this class, so we omit the details.
+
+# Other remarks
+* Cpp can allocate arbitrary sized blocks of memory, whereas Java can only allocate memory through object instantiation. Otherwise, in Java, arbitrary blocks may be allocated in Java as an array of bytes.
+* Cpp has destructors, while Java has finalizers. Both are invoked before an object's deallocation but they differ significantly.
+  * An object's destructor in Cpp must be invoked implicitly for variables declared on the task and explicitly for deallocating an object.
+* In Java, the object's finalizer is invoked asynchronously after some time has passed since the object has been accessed for the last time and before it is deallocated.
+  * Note that only a few objects need finalizers. In particularly, one is needed only for objects that *must* guarantee some cleanup of object state before deallocating.
 
 
