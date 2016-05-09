@@ -17,7 +17,7 @@ An example:
     };
 
     A* a = nullptr;
-    // Do stuff with a here.
+    // Do stuff with a here after allocating memory rather than setting to nullptr.
 ```
 
 # Java

@@ -1,5 +1,5 @@
 # Cpp
-In Cpp, strings are compared lexographically by default by using `std::basic_string's operator==`. Note that since Cpp allows operator overloading, so one could define string's `operator==` however they want.
+In Cpp, strings are compared lexographically by default by using `std::basic_string's operator==`. Note that since Cpp allows operator overloading, one could define string's `operator==` however they want.
 
 Note that `std::string::compare()` method returns
 * 0 if `s` and `t` are equal

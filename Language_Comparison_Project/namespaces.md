@@ -23,7 +23,7 @@ int main()
 }
 ```
 
-We can use `using` directives to specify which namespace we want to use. We can also do many other fun things such as inline namespaces, unnamed namespaces (will generated unique reprentation when nested in a named outer namespace), and others. For now, we just discussed the basic usage of them.
+We can use `using` directives to specify which namespace we want to use. We can also do many other fun things such as inline namespaces, unnamed namespaces (will generated unique reprentation when nested in a named outer namespace), and others. For now, we just discuss the basic usage of them.
 
 Nested namespace example:
 ```cpp
